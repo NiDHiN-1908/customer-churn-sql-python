@@ -1,29 +1,24 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
 from sklearn.linear_model import LogisticRegression
 import joblib
 
-# Load dataset
 df = pd.read_csv("data/telco_churn_kaggle.csv")
+df.columns = df.columns.str.strip()
 
-# Clean TotalCharges column
-df["TotalCharges"] = pd.to_numeric(df["TotalCharges"], errors="coerce")
-df.dropna(inplace=True)
+# Create SQL-like features
+train_df = pd.DataFrame()
+train_df["age"] = df["age"]
+train_df["total_logins"] = df["longten"]
+train_df["avg_session"] = df["longmon"]
+train_df["total_payments"] = df["cardten"]
+train_df["failed_payments"] = df["tollten"]
+train_df["churn"] = df["churn"]
 
-# Encode categorical columns
-for col in df.select_dtypes(include="object"):
-    df[col] = LabelEncoder().fit_transform(df[col])
+X = train_df.drop("churn", axis=1)
+y = train_df["churn"]
 
-# Features and target
-X = df.drop("Churn", axis=1)
-y = df["Churn"]
-
-# Train model
 model = LogisticRegression(max_iter=1000)
 model.fit(X, y)
 
-# Save model
 joblib.dump(model, "ml/churn_model.pkl")
-
-print("Model trained and saved successfully.")
+print("Aligned model trained.")
