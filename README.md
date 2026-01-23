@@ -1,109 +1,136 @@
-# Customer Churn Prediction Using SQL and Python
+ChurnIQ – Data-Driven Customer Retention System
+Overview
 
-This project implements an end-to-end customer churn prediction system designed to support business decision-making. It integrates a relational database with Python analytics, basic machine learning, and an interactive Streamlit dashboard to identify customers at risk of churn.
+ChurnIQ is an end-to-end customer churn prediction platform built using PostgreSQL, Python, and Machine Learning.
+It analyzes real-world telecom customer data and predicts which users are likely to churn, enabling businesses to take proactive retention actions.
 
-The focus of this project is on business relevance, data pipeline clarity, and explainability rather than complex modeling.
+This project demonstrates a complete data science workflow:
 
+Database → Feature Engineering → Machine Learning → Business Dashboard
 
-## Problem Statement
+Business Use Case
 
-Customer churn leads to revenue loss and reduced growth.  
-The objective of this project is to analyze customer behavior and predict churn using historical data, enabling businesses to take proactive retention actions.
+Customer churn directly reduces revenue and increases acquisition costs.
+ChurnIQ helps organizations:
 
+Identify customers with a high risk of churn
 
-## Tech Stack
+Take proactive retention actions
 
-- Database: MySQL  
-- Programming Language: Python  
-- Libraries: Pandas, NumPy, Scikit-learn, mysql-connector-python  
-- Visualization and UI: Streamlit  
-- Version Control: Git and GitHub  
+Improve customer retention strategies
 
+Make data-driven business decisions
 
-## Project Structure
+Technology Stack
 
-```text
+Database: PostgreSQL
+
+Data Processing: Python, Pandas
+
+Machine Learning: Scikit-learn (Logistic Regression)
+
+Visualization: Streamlit
+
+Connectivity: psycopg2
+
+Model Storage: joblib
+
+Machine Learning Details
+
+Problem Type: Binary Classification
+
+Target Variable: churn (0 = retained, 1 = churned)
+
+Features: tenure, age, income, longmon, tollmon, wiremon, cardmon
+
+Model: Logistic Regression with StandardScaler
+
+Evaluation Metrics: Accuracy, Precision, Recall, F1-Score
+
+Project Structure
+
 churn_analysis_project/
+│
+├── data/
+│   └── telco_churn_kaggle.csv
+│
 ├── database/
-│   └── schema.sql
+│   ├── schema.sql
+│   └── views.sql
+│
+├── ml/
+│   ├── train_model.py
+│   └── churn_model.pkl
+│
 ├── python/
-│   └── analysis.py
+│   └── predict.py
+│
 ├── frontend/
 │   └── app.py
-└── report/
-```
+│
+├── report/
+│   └── screenshots/
+│
+├── .env.example
+├── .gitignore
+├── requirements.txt
+└── README.md
 
-- database contains the SQL schema  
-- python contains data analysis and churn prediction logic  
-- frontend contains the Streamlit dashboard  
-- report is reserved for documentation and screenshots  
+System Workflow
 
+Load customer data into PostgreSQL
 
+Create SQL view for ML features
 
-## Methodology
+Train Logistic Regression model using Python
 
-1. Designed a relational database with tables for customers, subscriptions, usage logs, and payments  
-2. Inserted sample data to simulate real-world customer behavior  
-3. Engineered churn-related features using SQL joins and aggregations  
-4. Connected MySQL to Python using mysql-connector  
-5. Cleaned and preprocessed data using Pandas  
-6. Built a Logistic Regression model to predict customer churn  
-7. Visualized churn metrics and high-risk customers using Streamlit  
+Generate churn predictions
 
+Display insights in Streamlit dashboard
 
-## Key Features
+Installation & Execution
+1. Install Dependencies
+pip install -r requirements.txt
 
-- SQL-based feature engineering  
-- Python–MySQL integration  
-- Churn prediction using Logistic Regression  
-- Interactive dashboard for business users  
-- Clear separation of database, analysis, and presentation layers  
+2. Setup Database
+\i database/schema.sql
+\i database/views.sql
 
+3. Import Dataset
+\copy telco_customers FROM 'data/telco_churn_kaggle.csv' CSV HEADER;
 
-## Dashboard Overview
+4. Train Model
+python ml/train_model.py
 
-The Streamlit dashboard displays:
-- Total customers  
-- Number of churned customers  
-- Retention rate  
-- Churn distribution  
-- List of high-risk customers  
+5. Generate Predictions
+python python/predict.py
 
-This enables non-technical users to interpret results easily.
+6. Run Dashboard
+streamlit run frontend/app.py
 
+Dashboard Output
 
-## How to Run the Project
+The Streamlit application displays:
 
-1. Create the database using `database/schema.sql`  
-2. Update database credentials in the code using placeholders or environment variables  
-3. Run the analysis script if required  
+Total customers
 
-```bash
-python python/analysis.py
-```
+Predicted churn count
 
-4. Launch the Streamlit dashboard  
+Churn probability per customer
 
-```bash
-python -m streamlit run frontend/app.py
-```
- 
+High-risk customer list
 
-## Important Note
+Future Scope
 
-This project uses a small sample dataset for demonstration purposes.  
-The goal is to showcase an end-to-end data science workflow rather than production-level accuracy.
+Integration with live customer data
 
+Advanced ML models (Random Forest, XGBoost)
 
-## Future Improvements
+Model performance dashboard
 
-- Larger and more realistic datasets  
-- Advanced churn modeling techniques  
-- Secure credential handling using environment variables  
-- Cloud deployment  
+Cloud deployment
 
+Author
 
-## Author
-
-Nidhin  
-Aspiring Data Scientist and AI/ML Enthusiast
+Nidhin
+Aspiring Data Scientist | Machine Learning Enthusiast
