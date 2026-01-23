@@ -1,40 +1,34 @@
-DROP TABLE IF EXISTS payments;
-DROP TABLE IF EXISTS usage_logs;
-DROP TABLE IF EXISTS subscriptions;
-DROP TABLE IF EXISTS customers;
+-- Drop table if it already exists (for clean reset)
+DROP TABLE IF EXISTS telco_customers;
 
-CREATE TABLE customers (
-    customer_id INT PRIMARY KEY,
-    name VARCHAR(100),
-    age INT,
-    gender VARCHAR(10),
-    region VARCHAR(50),
-    signup_date DATE
-);
-
-CREATE TABLE subscriptions (
-    subscription_id INT PRIMARY KEY,
-    customer_id INT,
-    plan_type VARCHAR(50),
-    start_date DATE,
-    end_date DATE,
-    status VARCHAR(20),
-    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
-);
-
-CREATE TABLE usage_logs (
-    usage_id INT PRIMARY KEY,
-    customer_id INT,
-    login_date DATE,
-    session_minutes INT,
-    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
-);
-
-CREATE TABLE payments (
-    payment_id INT PRIMARY KEY,
-    customer_id INT,
-    payment_date DATE,
-    amount DECIMAL(10,2),
-    payment_status VARCHAR(20),
-    FOREIGN KEY (customer_id) REFERENCES customers(customer_id)
+-- Main table to store customer behavioral data
+CREATE TABLE telco_customers (
+    tenure FLOAT,       -- Number of months the customer stayed
+    age FLOAT,
+    address FLOAT,
+    income FLOAT,
+    ed FLOAT,           -- Education level
+    employ FLOAT,       -- Years employed
+    equip FLOAT,        -- Equipment count
+    callcard FLOAT,
+    wireless FLOAT,
+    longmon FLOAT,     -- Monthly long distance charges
+    tollmon FLOAT,     -- Monthly toll charges
+    equipmon FLOAT,
+    cardmon FLOAT,
+    wiremon FLOAT,
+    longten FLOAT,     -- Total long distance usage
+    tollten FLOAT,
+    cardten FLOAT,
+    voice FLOAT,
+    pager FLOAT,
+    internet FLOAT,
+    callwait FLOAT,
+    confer FLOAT,
+    ebill FLOAT,
+    loglong FLOAT,
+    logtoll FLOAT,
+    lninc FLOAT,
+    custcat FLOAT,
+    churn FLOAT         -- Target variable (1 = churn, 0 = retain)
 );

@@ -1,24 +1,34 @@
+import psycopg2
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
 import joblib
 
-df = pd.read_csv("data/telco_churn_kaggle.csv")
-df.columns = df.columns.str.strip()
+# Connect to PostgreSQL
+conn = psycopg2.connect(
+    host="localhost",
+    user="postgres",
+    password="1908",
+    database="churn_analysis"
+)
 
-# Create SQL-like features
-train_df = pd.DataFrame()
-train_df["age"] = df["age"]
-train_df["total_logins"] = df["longten"]
-train_df["avg_session"] = df["longmon"]
-train_df["total_payments"] = df["cardten"]
-train_df["failed_payments"] = df["tollten"]
-train_df["churn"] = df["churn"]
+# Load features directly from SQL view
+df = pd.read_sql("SELECT * FROM churn_features", conn)
 
-X = train_df.drop("churn", axis=1)
-y = train_df["churn"]
+# Split features and target
+X = df.drop("churn", axis=1)
+y = df["churn"]
 
-model = LogisticRegression(max_iter=1000)
-model.fit(X, y)
+# ML pipeline: scaling + logistic regression
+pipeline = Pipeline([
+    ("scaler", StandardScaler()),     # Normalize numeric features
+    ("model", LogisticRegression(max_iter=1000))
+])
 
-joblib.dump(model, "ml/churn_model.pkl")
-print("Aligned model trained.")
+# Train model
+pipeline.fit(X, y)
+
+# Save trained model
+joblib.dump(pipeline, "ml/churn_model.pkl")
+print("Model trained from PostgreSQL and saved.")
