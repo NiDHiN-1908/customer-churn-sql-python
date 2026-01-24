@@ -1,45 +1,76 @@
 import streamlit as st
 import pandas as pd
+import psycopg2
+import joblib
 import plotly.express as px
 
 st.set_page_config(page_title="ChurnIQ Dashboard", layout="wide")
 
-st.title("ChurnIQ – Customer Retention Dashboard")
+# ----------------------------
+# Database Connection
+# ----------------------------
+@st.cache_data
+def load_data():
+    conn = psycopg2.connect(
+        host="localhost",
+        user="postgres",
+        password="1908",
+        database="churn_analysis"
+    )
+    return pd.read_sql("SELECT * FROM churn_features", conn)
 
-df = pd.read_csv("python/churn_predictions.csv")
+df = load_data()
 
-total = len(df)
-churned = (df["predicted_churn"] == 1).sum()
-retained = total - churned
+# ----------------------------
+# Load Model
+# ----------------------------
+model = joblib.load("ml/churn_model.pkl")
 
-col1, col2, col3 = st.columns(3)
-col1.metric("Total Customers", total)
-col2.metric("Predicted Churn", churned)
-col3.metric("Retention", retained)
+X = df.drop("churn", axis=1)
+df["churn_probability"] = model.predict_proba(X)[:, 1]
+df["predicted_churn"] = model.predict(X)
+
+# ----------------------------
+# Header
+# ----------------------------
+st.title("ChurnIQ – Customer Churn Intelligence Dashboard")
+st.caption("SQL + Python + Machine Learning")
+
+# ----------------------------
+# KPIs
+# ----------------------------
+total_customers = len(df)
+churned = int(df["predicted_churn"].sum())
+retention = round((1 - churned / total_customers) * 100, 2)
+
+c1, c2, c3 = st.columns(3)
+c1.metric("Total Customers", total_customers)
+c2.metric("Predicted Churn", churned)
+c3.metric("Retention Rate (%)", retention)
 
 st.divider()
 
-# Churn Distribution
+# ----------------------------
+# Visualizations
+# ----------------------------
 st.subheader("Churn Distribution")
-fig1 = px.pie(
-    names=["Retained", "Churned"],
-    values=[retained, churned],
-    title="Customer Churn Split"
-)
+fig1 = px.pie(df, names="predicted_churn", title="Predicted Churn Split")
 st.plotly_chart(fig1, use_container_width=True)
 
-# Probability Distribution
-st.subheader("Churn Risk Distribution")
-fig2 = px.histogram(
-    df,
-    x="churn_probability",
-    nbins=20,
-    title="Churn Probability Distribution"
-)
+st.subheader("Churn Probability Distribution")
+fig2 = px.histogram(df, x="churn_probability", nbins=20)
 st.plotly_chart(fig2, use_container_width=True)
 
-# High Risk Customers
-st.subheader("Top 20 High-Risk Customers")
-st.dataframe(df.sort_values("churn_probability", ascending=False).head(20))
+st.subheader("Top High-Risk Customers")
+st.dataframe(df.sort_values("churn_probability", ascending=False).head(10))
 
-st.success("Live churn analytics loaded.")
+st.divider()
+
+# ----------------------------
+# Model Evaluation Images
+# ----------------------------
+st.subheader("Model Performance")
+
+col1, col2 = st.columns(2)
+col1.image("report/screenshots/confusion_matrix.png", caption="Confusion Matrix")
+col2.image("report/screenshots/roc_curve.png", caption="ROC Curve")
