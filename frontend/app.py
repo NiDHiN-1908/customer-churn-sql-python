@@ -61,13 +61,34 @@ st.subheader("Churn Probability Distribution")
 fig2 = px.histogram(df, x="churn_probability", nbins=20)
 st.plotly_chart(fig2, use_container_width=True)
 
-st.subheader("Top High-Risk Customers")
-st.dataframe(df.sort_values("churn_probability", ascending=False).head(10))
+st.divider()
+
+# ----------------------------
+# High-Risk Tables
+# ----------------------------
+st.subheader("High-Risk Customers")
+
+top_n = st.slider("Select number of customers to display", 10, len(df), 20)
+
+st.dataframe(
+    df.sort_values("churn_probability", ascending=False).head(top_n),
+    use_container_width=True
+)
+
+st.subheader("All Predicted Churn Customers")
+
+churn_only = df[df["predicted_churn"] == 1]
+st.write(f"Total churn-predicted customers: {len(churn_only)}")
+
+st.dataframe(
+    churn_only.sort_values("churn_probability", ascending=False),
+    use_container_width=True
+)
 
 st.divider()
 
 # ----------------------------
-# Model Evaluation Images
+# Model Evaluation
 # ----------------------------
 st.subheader("Model Performance")
 
